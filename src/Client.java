@@ -5,6 +5,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 class Client {
 	static FileInputStream fis = null;
@@ -44,15 +45,35 @@ class Client {
 	public static void receiveFile() throws IOException{
 		
 		System.out.println("In receiveFile");
+		
+		
+		
+		DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
+
+		
+		
 	//	 DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		 DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+		
+		 String sentence = "DownloadFile";
+		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		outToServer.writeBytes("Download\n");
+	//	inFromServer.close();
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
 		 byte[] bytes = new byte[1024];
  	    try {
 			in.read(bytes);
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
-	    System.out.println(bytes);
+	    System.out.println("File is in" +bytes);
 
 	    FileOutputStream fos = null;
 		try {
@@ -68,34 +89,35 @@ class Client {
 		}
 	    fos.flush();
 		fos.close();
-		
+		System.out.println("Received File complete\n");
 	}
 	
 	
 	public static void main(String[] argv) throws Exception {
 		int port = Integer.parseInt(argv[0]);
-		BufferedReader br = null;
+//		BufferedReader br = null;
 		System.out.println("Do you want to upload[1] or download[2] a file?\n");
-		String s = br.readLine();
-
+		Scanner scan = new Scanner(System.in);
+		String s = scan.next();
 		socket = new Socket("localhost", 1500);
 		DataOutputStream outToServer = new DataOutputStream(
 				socket.getOutputStream());
 		BufferedReader inFromServer = new BufferedReader(
 				new InputStreamReader(socket.getInputStream()));
 		
-		
-		if (br.equals('1')) {
+		/*
+		if (s.equals('1')) {
 			String sentence = "Upload\n";
 			
 			outToServer.writeBytes(sentence + "\n");
 			sendFile("C:\\Users\\Sean\\workspace2\\test.txt");
 
 		}
-		else if(br.equals('2')){
+		else if(s.equals('2')){
+			*/
 			receiveFile();
 			
-		}
+	//	}
 		inFromServer.close();
 		outToServer.close();
 		socket.close();

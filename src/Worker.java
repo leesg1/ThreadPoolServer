@@ -10,6 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Worker implements Runnable {
+	static FileInputStream fis = null;
+	static BufferedInputStream bis = null;
+	static OutputStream outToServer;
 
 	Socket socket;
 	public Worker(Socket socket) throws IOException, InterruptedException {
@@ -17,17 +20,17 @@ public class Worker implements Runnable {
 		BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		String message = inFromClient.readLine();
 		System.out.println("Message from client:" + message);
-		Thread.sleep(1000);
+	//	Thread.sleep(1000);
 		if(message.equals("HELO text\n".trim())){
 			dealWithHELO(socket);
 		}
 		else if(message.equals("KILL_SERVICE\n".trim())){
 			dealWithKill(socket);
 		}
-		else if(message.equals("Upload\n".trim()){
+		else if(message.equals("Upload\n".trim())){
 			receiveFile();
 		}
-		else if(message.equals("Download\n".trim()){
+		else if(message.equals("Download\n".trim())){
 			sendFile();
 		}
 	}
@@ -73,7 +76,43 @@ public class Worker implements Runnable {
 		}
 	}
 	private void sendFile(){
-		
+		String file = "C:\\Users\\Sean\\filterList.txt";
+		File myFile = new File(file);
+		byte[] mybytearray = new byte[(int) myFile.length()];
+		try {
+			fis = new FileInputStream(myFile);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		bis = new BufferedInputStream(fis);
+		try {
+			bis.read(mybytearray, 0, mybytearray.length);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			outToServer = socket.getOutputStream();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Sending " + file + "(" + mybytearray.length
+				+ " bytes)");
+		try {
+			outToServer.write(mybytearray, 0, mybytearray.length);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			outToServer.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Done.");
 	}
 
 	private void dealWithHELO(Socket socket) throws UnknownHostException {
