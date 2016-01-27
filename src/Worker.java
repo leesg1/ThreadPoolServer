@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 public class Worker implements Runnable {
 	static FileInputStream fis = null;
 	static BufferedInputStream bis = null;
-	static OutputStream outToServer;
+	static OutputStream outToClient;
 
 	Socket socket;
 	public Worker(Socket socket) throws IOException, InterruptedException {
@@ -30,8 +30,9 @@ public class Worker implements Runnable {
 		else if(message.equals("Upload\n".trim())){
 			receiveFile();
 		}
-		else if(message.equals("Download\n".trim())){
-			sendFile();
+		else if(message.contains("Download".trim())){
+			String fileName = inFromClient.readLine();
+			sendFile(fileName);
 		}
 	}
 	private void saveFile() throws IOException{
@@ -48,7 +49,7 @@ public class Worker implements Runnable {
 
 	    FileOutputStream fos = null;
 		try {
-			fos = new FileOutputStream("test.txt");
+			fos = new FileOutputStream("testSavingOnServer.txt");
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -75,9 +76,9 @@ public class Worker implements Runnable {
 		    System.err.println(x);
 		}
 	}
-	private void sendFile(){
-		String file = "C:\\Users\\Sean\\filterList.txt";
-		File myFile = new File(file);
+	private void sendFile(String fileName){
+		String file = "C:\\Users\\Sean\\";
+		File myFile = new File(file + fileName);
 		byte[] mybytearray = new byte[(int) myFile.length()];
 		try {
 			fis = new FileInputStream(myFile);
@@ -93,7 +94,7 @@ public class Worker implements Runnable {
 			e.printStackTrace();
 		}
 		try {
-			outToServer = socket.getOutputStream();
+			outToClient = socket.getOutputStream();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,13 +102,13 @@ public class Worker implements Runnable {
 		System.out.println("Sending " + file + "(" + mybytearray.length
 				+ " bytes)");
 		try {
-			outToServer.write(mybytearray, 0, mybytearray.length);
+			outToClient.write(mybytearray, 0, mybytearray.length);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
-			outToServer.flush();
+			outToClient.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

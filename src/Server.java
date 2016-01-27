@@ -37,19 +37,6 @@ public class Server {
 		server.start();
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 			// get the server to accept the file
 			
 			// things to do
@@ -58,7 +45,8 @@ public class Server {
 			// 
 
 
-
+	/// need to request file by name
+	//  need to handle the file not being there
 
 
 
